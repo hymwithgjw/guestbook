@@ -172,45 +172,63 @@ function postMsg() {
 }
 submitBtn.addEventListener('click', postMsg);
 
-/* ============ 加载留言 ============ */
-function isAudioPlaying() {
-    var a = document.querySelectorAll('audio');
-    for (var i = 0; i < a.length; i++) {
-        if (!a[i].paused && !a[i].ended) return true;
+/* ============ 加载留言（增量更新，不销毁已有元素） ============ */
+var knownIds = {};  // 已展示的留言 id
+
+function msgHtml(m) {
+    var t = '';
+    if (m.created_at) {
+        var bj = new Date(new Date(m.created_at).getTime() + 8 * 3600000);
+        t = bj.toISOString().slice(11, 19);
     }
-    return false;
+    var fh = '';
+    if (m.file_url && m.file_type === 'image') {
+        fh = '<div class="msg-file"><img src="' + m.file_url + '" onclick="window.open(\'' + m.file_url + '\')" /></div>';
+    }
+    if (m.file_url && m.file_type === 'audio') {
+        fh = '<div class="msg-file"><audio src="' + m.file_url + '" controls preload="none"></audio></div>';
+    }
+    return '<div class="msg-item" data-id="' + m.id + '"><div class="msg-header"><span class="msg-name">' +
+        esc(m.name) + '</span><span class="msg-time">' + t + '</span></div>' +
+        (m.content ? '<div class="msg-content">' + esc(m.content) + '</div>' : '') +
+        fh + '</div>';
 }
 
 function loadMessages() {
     fetch(API + '/rest/v1/messages?order=created_at.desc&limit=200', {
         headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
     }).then(function(r) { return r.json(); }).then(function(data) {
-        // 准备替换内容前检查音频是否在播放
-        if (isAudioPlaying()) return;
         if (!data || !data.length) {
-            messagesList.innerHTML = '<div class="empty-state">还没有留言，来写第一条吧！</div>';
-            msgCount.textContent = '0 条';
+            if (Object.keys(knownIds).length === 0) {
+                messagesList.innerHTML = '<div class="empty-state">还没有留言，来写第一条吧！</div>';
+            }
+            msgCount.textContent = Object.keys(knownIds).length + ' 条';
             return;
         }
         msgCount.textContent = data.length + ' 条';
-        messagesList.innerHTML = data.map(function(m) {
-            var t = '';
-            if (m.created_at) {
-                var bj = new Date(new Date(m.created_at).getTime() + 8 * 3600000);
-                t = bj.toISOString().slice(11, 19);
+
+        // 首次加载：全量渲染
+        if (Object.keys(knownIds).length === 0) {
+            messagesList.innerHTML = data.map(msgHtml).join('');
+            data.forEach(function(m) { knownIds[m.id] = true; });
+            return;
+        }
+
+        // 增量更新：只把新留言加到最前面
+        var newItems = '';
+        var newCount = 0;
+        for (var i = 0; i < data.length; i++) {
+            if (!knownIds[data[i].id]) {
+                newItems += msgHtml(data[i]);
+                knownIds[data[i].id] = true;
+                newCount++;
+            } else {
+                break;  // 因为按时间倒序，遇到已知的说明后面的都已知
             }
-            var fh = '';
-            if (m.file_url && m.file_type === 'image') {
-                fh = '<div class="msg-file"><img src="' + m.file_url + '" onclick="window.open(\'' + m.file_url + '\')" /></div>';
-            }
-            if (m.file_url && m.file_type === 'audio') {
-                fh = '<div class="msg-file"><audio src="' + m.file_url + '" controls preload="none"></audio></div>';
-            }
-            return '<div class="msg-item"><div class="msg-header"><span class="msg-name">' +
-                esc(m.name) + '</span><span class="msg-time">' + t + '</span></div>' +
-                (m.content ? '<div class="msg-content">' + esc(m.content) + '</div>' : '') +
-                fh + '</div>';
-        }).join('');
+        }
+        if (newItems) {
+            messagesList.insertAdjacentHTML('afterbegin', newItems);
+        }
     }).catch(function(){});
 }
 
