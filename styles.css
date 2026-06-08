@@ -171,6 +171,18 @@ header {
     50% { box-shadow: 0 0 0 6px rgba(255, 50, 50, 0); }
 }
 
+.cancel-btn {
+    border-color: rgba(255, 71, 87, 0.4);
+    color: #ff4757;
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 71, 87, 0.15);
+    color: #ff6b6b;
+}
+
+.hidden { display: none !important; }
+
 .upload-status {
     font-size: 0.8rem;
     color: var(--text-secondary);
