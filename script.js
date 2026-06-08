@@ -12,6 +12,7 @@ var msgCount = document.getElementById('msgCount');
 var fileInput = document.getElementById('fileInput');
 var photoBtn = document.getElementById('photoBtn');
 var voiceBtn = document.getElementById('voiceBtn');
+var cancelRecordBtn = document.getElementById('cancelRecordBtn');
 var uploadStatus = document.getElementById('uploadStatus');
 var previewArea = document.getElementById('previewArea');
 var previewContent = document.getElementById('previewContent');
@@ -47,9 +48,24 @@ fileInput.addEventListener('change', function() {
 });
 
 /* ============ 录音 ============ */
+function cancelRecording() {
+    if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+        mediaRecorder.onstop = null;
+        mediaRecorder.stop();
+    }
+    audioChunks = [];
+    isRecording = false;
+    voiceBtn.classList.remove('recording');
+    voiceBtn.textContent = '🎤 录音';
+    cancelRecordBtn.classList.add('hidden');
+    uploadStatus.textContent = '';
+}
+
+cancelRecordBtn.addEventListener('click', cancelRecording);
+
 voiceBtn.addEventListener('click', function() {
     if (isRecording) {
-        // 停止录音
+        // 停止录音 → 进入预览
         if (mediaRecorder && mediaRecorder.state !== 'inactive') {
             mediaRecorder.stop();
         }
@@ -79,12 +95,14 @@ voiceBtn.addEventListener('click', function() {
             setPendingFile(blob, 'audio');
             voiceBtn.classList.remove('recording');
             voiceBtn.textContent = '🎤 录音';
+            cancelRecordBtn.classList.add('hidden');
             isRecording = false;
         };
         mediaRecorder.start();
         isRecording = true;
         voiceBtn.classList.add('recording');
         voiceBtn.textContent = '⏹ 停止';
+        cancelRecordBtn.classList.remove('hidden');
         uploadStatus.textContent = '录音中...';
     }).catch(function() {
         uploadStatus.textContent = '需要麦克风权限';
