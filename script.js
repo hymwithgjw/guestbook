@@ -81,7 +81,11 @@ function loadMessages() {
         }
         msgCount.textContent = data.length + ' 条';
         messagesList.innerHTML = data.map(function(m) {
-            var time = m.created_at ? m.created_at.slice(11, 16) : '';
+            var time = '';
+            if (m.created_at) {
+                var bj = new Date(new Date(m.created_at).getTime() + 8 * 3600000);
+                time = bj.toISOString().slice(11, 19);
+            }
             return '<div class="msg-item">' +
                 '<div class="msg-header">' +
                     '<span class="msg-name">' + esc(m.name) + '</span>' +
