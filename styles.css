@@ -295,6 +295,36 @@ header {
     color: rgba(255, 255, 255, 0.3);
 }
 
+.messages-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.refresh-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: var(--text-secondary);
+    width: 30px;
+    height: 30px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #fff;
+}
+
+.refresh-btn:active {
+    transform: rotate(60deg);
+}
+
 .messages-list {
     max-height: 600px;
     overflow-y: auto;
