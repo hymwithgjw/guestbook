@@ -246,4 +246,4 @@ $('refreshBtn').addEventListener('click', function() {
 
 /* ============ 启动 ============ */
 loadMessages();
-// 不设自动刷新，按需手动刷新，避免音频中断
+setInterval(loadMessages, 3000);
