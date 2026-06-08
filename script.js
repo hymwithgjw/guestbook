@@ -156,6 +156,7 @@ function postMsg() {
             uploadStatus.textContent = '';
             submitBtn.disabled = false;
             submitBtn.textContent = '📨 发布留言';
+            knownIds = {};  // 清空缓存，重新加载
             loadMessages();
         }).catch(function() {
             submitBtn.disabled = false;
@@ -238,6 +239,11 @@ function esc(s) {
     return d.innerHTML;
 }
 
+/* ============ 刷新按钮 ============ */
+$('refreshBtn').addEventListener('click', function() {
+    loadMessages();
+});
+
 /* ============ 启动 ============ */
 loadMessages();
-setInterval(loadMessages, 3000);
+// 不设自动刷新，按需手动刷新，避免音频中断
