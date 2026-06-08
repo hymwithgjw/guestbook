@@ -29,6 +29,22 @@
                 <textarea id="contentInput" placeholder="写点什么..." maxlength="500" rows="3"></textarea>
                 <span class="char-count" id="charCount">0/500</span>
             </div>
+
+            <!-- 文件上传工具栏 -->
+            <div class="upload-toolbar">
+                <button class="upload-btn" id="photoBtn" title="拍照/传图">📷 图片</button>
+                <button class="upload-btn" id="voiceBtn" title="录音">🎤 录音</button>
+                <span class="upload-status" id="uploadStatus"></span>
+            </div>
+
+            <!-- 预览区域 -->
+            <div class="preview-area hidden" id="previewArea">
+                <span class="preview-close" id="previewClose">✕</span>
+                <div class="preview-content" id="previewContent"></div>
+            </div>
+
+            <!-- 隐藏的文件输入 -->
+            <input type="file" id="fileInput" accept="image/*" capture="environment" hidden />
             <button class="submit-btn" id="submitBtn">📨 发布留言</button>
         </div>
 
@@ -44,6 +60,6 @@
         </div>
     </div>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=3"></script>
 </body>
 </html>
