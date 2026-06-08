@@ -173,20 +173,20 @@ function postMsg() {
 submitBtn.addEventListener('click', postMsg);
 
 /* ============ 加载留言 ============ */
-var audioPlaying = false;
+function isAudioPlaying() {
+    var a = document.querySelectorAll('audio');
+    for (var i = 0; i < a.length; i++) {
+        if (!a[i].paused && !a[i].ended) return true;
+    }
+    return false;
+}
 
 function loadMessages() {
-    // 如果有音频在播放，跳过本次刷新
-    var audios = document.querySelectorAll('audio');
-    var playing = false;
-    for (var i = 0; i < audios.length; i++) {
-        if (!audios[i].paused) { playing = true; break; }
-    }
-    if (playing) return;
-
     fetch(API + '/rest/v1/messages?order=created_at.desc&limit=200', {
         headers: { 'apikey': KEY, 'Authorization': 'Bearer ' + KEY }
     }).then(function(r) { return r.json(); }).then(function(data) {
+        // 准备替换内容前检查音频是否在播放
+        if (isAudioPlaying()) return;
         if (!data || !data.length) {
             messagesList.innerHTML = '<div class="empty-state">还没有留言，来写第一条吧！</div>';
             msgCount.textContent = '0 条';
